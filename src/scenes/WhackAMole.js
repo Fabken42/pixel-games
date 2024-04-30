@@ -11,19 +11,19 @@ class WhackMoleGameScene extends Phaser.Scene {
     constructor() {
         super({ key: "whackMoleGameScene" });
         this.spawnEnemyLocations = [
-            { x: 175, y: 170 },
-            { x: 420, y: 170 },
-            { x: 665, y: 170 },
-            { x: 175, y: 335 },
-            { x: 420, y: 335 },
-            { x: 665, y: 335 },
-            { x: 175, y: 500 },
-            { x: 420, y: 500 },
-            { x: 665, y: 500 },
+            { x: 152, y: 180 },
+            { x: 397, y: 180 },
+            { x: 642, y: 180 },
+            { x: 152, y: 345 },
+            { x: 397, y: 345 },
+            { x: 642, y: 345 },
+            { x: 152, y: 510 },
+            { x: 397, y: 510 },
+            { x: 642, y: 510 },
         ];
 
-        this.remainingTime = 10;
-        this.score = 0;
+        this.remainingTime = undefined;
+        this.score = undefined;
         this.enemyGroup = undefined;
         this.scoreText = undefined;
         this.remainingTimeText = undefined;
@@ -48,6 +48,17 @@ class WhackMoleGameScene extends Phaser.Scene {
 
         this.scoreText = this.add.text(16, 16, 'Pontuação: 0', { fontSize: '32px', fill: '#fff' });
         this.remainingTimeText = this.add.text(16, 60, 'Tempo restante: 30', { fontSize: '32px', fill: '#fff' });
+
+        this.anims.create({
+            key: 'enemyAnimation',
+            frames: [
+                { key: 'enemy01' },
+                { key: 'enemy02' },
+                { key: 'enemy03' }
+            ],
+            frameRate: 5, // Taxa de quadros por segundo
+            repeat: -1 // Repetir indefinidamente
+        });
 
         this.time.addEvent({
             delay: 1000,
@@ -80,6 +91,10 @@ class WhackMoleGameScene extends Phaser.Scene {
         let newEnemy = this.enemyGroup.create(randomLocation.x, randomLocation.y, 'enemy03');
         newEnemy.setScale(5);
         newEnemy.setInteractive();
+
+        // let bounds = newEnemy.getBounds(); //todo
+        // let graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x00ff00 } });
+        // graphics.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
         newEnemy.on('pointerdown', () => this.onEnemyClick(newEnemy), this);
     }
