@@ -50,14 +50,25 @@ class WhackMoleGameScene extends Phaser.Scene {
         this.remainingTimeText = this.add.text(16, 60, 'Tempo restante: 30', { fontSize: '32px', fill: '#fff' });
 
         this.anims.create({
-            key: 'enemyAnimation',
+            key: 'enemySpawnAnimation',
             frames: [
                 { key: 'enemy01' },
                 { key: 'enemy02' },
                 { key: 'enemy03' }
             ],
-            frameRate: 5, // Taxa de quadros por segundo
-            repeat: -1 // Repetir indefinidamente
+            frameRate: 5,
+            repeat: false
+        });
+
+        this.anims.create({
+            key: 'enemyDespawnAnimation',
+            frames: [
+                { key: 'enemy03' },
+                { key: 'enemy02' },
+                { key: 'enemy01' }
+            ],
+            frameRate: 5,
+            repeat: false
         });
 
         this.time.addEvent({
@@ -88,15 +99,30 @@ class WhackMoleGameScene extends Phaser.Scene {
     spawnEnemy() {
         const randomLocation = Phaser.Math.RND.pick(this.spawnEnemyLocations);
 
-        let newEnemy = this.enemyGroup.create(randomLocation.x, randomLocation.y, 'enemy03');
+        let newEnemy = this.enemyGroup.create(randomLocation.x, randomLocation.y, 'enemy01');
         newEnemy.setScale(5);
         newEnemy.setInteractive();
 
-        // let bounds = newEnemy.getBounds(); //todo
+        newEnemy.play('enemySpawnAnimation', false);
+
+        // let bounds = newEnemy.getBounds();
         // let graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x00ff00 } });
         // graphics.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
         newEnemy.on('pointerdown', () => this.onEnemyClick(newEnemy), this);
+
+        this.time.delayedCall(1000, () => {
+            if (newEnemy && newEnemy.active) this.despawnEnemy(newEnemy);
+        });
+    }
+
+    despawnEnemy(newEnemy) {
+        newEnemy.play('enemyDespawnAnimation');
+        this.time.delayedCall(600, () => {
+            if (newEnemy && newEnemy.active) {
+                newEnemy.destroy();
+            }
+        });
     }
 
     onEnemyClick(enemyClicked) {
