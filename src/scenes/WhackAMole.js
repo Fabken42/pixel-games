@@ -5,23 +5,13 @@ import GameBG from '../assets/whack-mole-bg.png';
 import Enemy01 from "../assets/enemy01.png";
 import Enemy02 from "../assets/enemy02.png";
 import Enemy03 from "../assets/enemy03.png";
+import HitEffect from "../assets/hit-effect.png";
 import EnemyHit from "../assets/hit-enemy.wav";
 
 class WhackMoleGameScene extends Phaser.Scene {
     constructor() {
         super({ key: "whackMoleGameScene" });
-        this.spawnEnemyLocations = [
-            { x: 152, y: 180 },
-            { x: 397, y: 180 },
-            { x: 642, y: 180 },
-            { x: 152, y: 345 },
-            { x: 397, y: 345 },
-            { x: 642, y: 345 },
-            { x: 152, y: 510 },
-            { x: 397, y: 510 },
-            { x: 642, y: 510 },
-        ];
-
+        this.spawnEnemyLocations = undefined;
         this.remainingTime = undefined;
         this.score = undefined;
         this.enemyGroup = undefined;
@@ -34,13 +24,24 @@ class WhackMoleGameScene extends Phaser.Scene {
         this.load.image("enemy01", Enemy01);
         this.load.image("enemy02", Enemy02);
         this.load.image("enemy03", Enemy03);
+        this.load.image("hit-particle", HitEffect);
         this.load.audio("enemy-hit-sound", EnemyHit);
     }
 
     create() {
+        this.spawnEnemyLocations = [
+            { x: 152, y: 180 },
+            { x: 397, y: 180 },
+            { x: 642, y: 180 },
+            { x: 152, y: 345 },
+            { x: 397, y: 345 },
+            { x: 642, y: 345 },
+            { x: 152, y: 510 },
+            { x: 397, y: 510 },
+            { x: 642, y: 510 },
+        ];
         this.enemyGroup = this.add.group();
-
-        this.remainingTime = 10;
+        this.remainingTime = 30;
         this.score = 0;
 
         const gameBG = this.add.image(0, 0, 'gameBG').setOrigin(0);
@@ -79,7 +80,7 @@ class WhackMoleGameScene extends Phaser.Scene {
         });
 
         this.time.addEvent({
-            delay: Phaser.Math.Between(800, 1600),
+            delay: 700,
             loop: true,
             callback: this.spawnEnemy,
             callbackScope: this
@@ -97,36 +98,53 @@ class WhackMoleGameScene extends Phaser.Scene {
     }
 
     spawnEnemy() {
-        const randomLocation = Phaser.Math.RND.pick(this.spawnEnemyLocations);
+        if (this.spawnEnemyLocations.length === 0) {
+            return;
+        }
+
+        const randomIndex = Phaser.Math.RND.between(0, this.spawnEnemyLocations.length - 1);
+        const randomLocation = this.spawnEnemyLocations[randomIndex];
+        const removedLocation = this.spawnEnemyLocations.splice(randomIndex, 1)[0];
 
         let newEnemy = this.enemyGroup.create(randomLocation.x, randomLocation.y, 'enemy01');
         newEnemy.setScale(5);
         newEnemy.setInteractive();
+        newEnemy.play('enemySpawnAnimation');
 
-        newEnemy.play('enemySpawnAnimation', false);
+        newEnemy.on('pointerdown', (ptr) => this.onEnemyClick(ptr, newEnemy, removedLocation), this);
 
-        // let bounds = newEnemy.getBounds();
-        // let graphics = this.add.graphics({ lineStyle: { width: 2, color: 0x00ff00 } });
-        // graphics.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-
-        newEnemy.on('pointerdown', () => this.onEnemyClick(newEnemy), this);
-
-        this.time.delayedCall(1000, () => {
-            if (newEnemy && newEnemy.active) this.despawnEnemy(newEnemy);
+        //após 600ms, inimigo começa a desaparecer
+        this.time.delayedCall(600, () => {
+            if (newEnemy && newEnemy.active) {
+                this.despawnEnemy(newEnemy, removedLocation);
+            }
         });
     }
 
-    despawnEnemy(newEnemy) {
+    despawnEnemy(newEnemy, removedLocation) {
         newEnemy.play('enemyDespawnAnimation');
+        //alterar valor conforme 'frameRate de this.anims.create em create()'
         this.time.delayedCall(600, () => {
             if (newEnemy && newEnemy.active) {
+                this.spawnEnemyLocations.push(removedLocation);
                 newEnemy.destroy();
             }
         });
     }
 
-    onEnemyClick(enemyClicked) {
+    onEnemyClick(ptr, enemyClicked, removedLocation) {
+        this.spawnEnemyLocations.push(removedLocation);
         enemyClicked.destroy();
+
+        let particle = this.add.particles(ptr.x, ptr.y, 'hit-particle',
+            {
+                speed: { min: -100, max: 100 },
+                angle: { min: 0, max: 360 },
+                scale: { start: 1, end: 0 },
+                duration: 100,
+                blendMode: 'ADD'
+            })
+
         this.scoreText.setText(`Pontuação: ${++this.score}`);
         this.sound.play('enemy-hit-sound', { volume: 0.5 });
     }
@@ -148,10 +166,12 @@ class WhackMoleMenuScene extends Phaser.Scene {
         this.add.text(400, 100, 'Whack a Mole', { fontSize: '64px', fill: '#ffffff' }).setOrigin(0.5);
 
         // Obtém a pontuação do registro do jogo
-        const score = this.registry.get('score');
+        let score = this.registry.get('score');
 
         // Adiciona o texto da pontuação na tela
-        this.add.text(400, 200, `Pontuação: ${score}`, { fontSize: '32px', fill: '#ffffff' }).setOrigin(0.5);
+        if (score) {
+            this.add.text(400, 200, `Pontuação: ${score}`, { fontSize: '32px', fill: '#ffffff' }).setOrigin(0.5);
+        }
 
         // Adiciona o botão de jogar
         const playButton = this.add.text(400, 300, 'Jogar', { fontSize: '32px', fill: '#ffffff' }).setOrigin(0.5);
@@ -173,7 +193,7 @@ export default function WhackAMoleScene() {
         height: 600,
 
         pixelArt: true,
-        scene: [WhackMoleGameScene, WhackMoleMenuScene]
+        scene: [WhackMoleMenuScene, WhackMoleGameScene]
     };
 
     return <div>
