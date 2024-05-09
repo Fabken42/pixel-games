@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+
 import GameBG from '../assets/img/game-bg.png';
 import Enemy01 from "../assets/img/enemy01.png";
 import Enemy02 from "../assets/img/enemy02.png";
@@ -10,20 +11,12 @@ import EnemyHit02 from "../assets/audio/hit-enemy-02.wav";
 import EnemyHit03 from "../assets/audio/hit-enemy-03.wav";
 import BackgroundMusic from "../assets/audio/background-music.wav";
 
-const GAME_FONT = '"Press Start 2P"';
-
 export default class GameScene extends Phaser.Scene {
+    static gameFont = '"Press Start 2P"'
+    static increaseTimes = 5;
+
     constructor() {
         super({ key: "gameScene" });
-        this.spawnEnemyLocations = undefined;
-        this.remainingTime = undefined;
-        this.score = undefined;
-        this.level = undefined;
-        this.enemyGroup = undefined;
-        this.scoreText = undefined;
-        this.remainingTimeText = undefined;
-        this.levelText = undefined;
-        this.clickCounter = undefined;
     }
 
     preload() {
@@ -59,15 +52,14 @@ export default class GameScene extends Phaser.Scene {
         this.spawnEnemyDelayMin = 700;
         this.spawnEnemyDelayMax = 1100;
 
-        const gameBG = this.add.image(0, 0, 'gameBG').setOrigin(0);
-        gameBG.setScale(5);
+        this.add.image(0, 0, 'gameBG').setOrigin(0).setScale(GameScene.increaseTimes);
 
         this.backgroundMusic = this.sound.add('background-music', { loop: true, volume: 0.75 });
         this.backgroundMusic.play();
 
-        this.scoreText = this.add.text(16, 16, `Pontuação: ${this.score}`, { fontFamily: GAME_FONT, fontSize: '24px', fill: '#fff' });
-        this.remainingTimeText = this.add.text(16, 60, `Tempo restante: ${this.remainingTime}`, { fontFamily: GAME_FONT, fontSize: '24px', fill: '#fff' });
-        this.levelText = this.add.text(this.cameras.main.width - 16, 16, `Nível: ${this.level}`, { fontFamily: GAME_FONT, fontSize: '24px', fill: '#fff', align: 'right' }).setOrigin(1, 0);
+        this.scoreText = this.add.text(16, 16, `Pontuação: ${this.score}`, { fontFamily: GameScene.gameFont, fontSize: '24px', fill: '#fff' });
+        this.remainingTimeText = this.add.text(16, 60, `Tempo restante: ${this.remainingTime}`, { fontFamily: GameScene.gameFont, fontSize: '24px', fill: '#fff' });
+        this.levelText = this.add.text(this.cameras.main.width - 16, 16, `Nível: ${this.level}`, { fontFamily: GameScene.gameFont, fontSize: '24px', fill: '#fff', align: 'right' }).setOrigin(1, 0);
 
         this.anims.create({
             key: 'enemySpawnAnimation',
@@ -125,7 +117,7 @@ export default class GameScene extends Phaser.Scene {
         const removedLocation = this.spawnEnemyLocations.splice(randomIndex, 1)[0];
 
         let newEnemy = this.enemyGroup.create(randomLocation.x, randomLocation.y, 'enemy01');
-        newEnemy.setScale(5);
+        newEnemy.setScale(GameScene.increaseTimes);
         newEnemy.setInteractive();
         newEnemy.play('enemySpawnAnimation');
 
@@ -154,7 +146,7 @@ export default class GameScene extends Phaser.Scene {
         this.clickCounter++;
 
         let enemyHitSprite = this.add.sprite(enemyClicked.x, enemyClicked.y, 'enemy-hit');
-        enemyHitSprite.setScale(5);
+        enemyHitSprite.setScale(GameScene.increaseTimes);
 
         this.time.delayedCall(500, () => {
             enemyHitSprite.destroy();

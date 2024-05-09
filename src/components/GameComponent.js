@@ -10,7 +10,7 @@ const GameComponent = ({ config }) => {
         }
     }, [])
 
-    return (
+    return ( 
         <div id="phaser-container" />
     )
 }
