@@ -14,11 +14,11 @@ export default function GameSceneConfig({ folderName, canvasWidth, canvasHeight,
             default: 'arcade',
             arcade: {
                 gravity: { y: gravity },
-                debug: false
+                debug:false
             }
         },
         pixelArt: isPixelArt,
-        scene: [GameScene,MenuScene]
+        scene: [MenuScene, GameScene]
     };
 
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>

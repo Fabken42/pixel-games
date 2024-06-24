@@ -10,8 +10,8 @@ export default class MenuScene extends Phaser.Scene {
     create() {
         this.add.text(400, 100, 'Tic Tac Toe', { fontFamily: MenuScene.gameFont, fontSize: '48px', fill: '#ffffff' }).setOrigin(0.5);
     
-        let player_score = this.registry.get('playerScore')
-        let enemy_score = this.registry.get('enemyScore')
+        let player_score = this.registry.get('player_score');
+        let enemy_score = this.registry.get('enemy_score');
 
         if (player_score !== undefined && enemy_score !== undefined) {
             this.add.text(400, 200, `CPU ${enemy_score} x ${player_score} JOG`, { fontFamily: MenuScene.gameFont, fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);

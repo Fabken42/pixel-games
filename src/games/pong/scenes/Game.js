@@ -1,4 +1,4 @@
-import Phaser, { Game } from "phaser";
+import Phaser from "phaser";
 
 import Background from "../assets/img/background.png";
 import Ball from "../assets/img/ball.png";

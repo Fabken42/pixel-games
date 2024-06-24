@@ -9,12 +9,11 @@ export default class MenuScene extends Phaser.Scene {
 
     create() {
         this.add.text(400, 100, 'Fruit Catch', { fontFamily: MenuScene.gameFont, fontSize: '48px', fill: '#ffffff' }).setOrigin(0.5);
-    
-        let player_score = this.registry.get('playerScore')
-        let enemy_score = this.registry.get('enemyScore')
 
-        if (player_score !== undefined && enemy_score !== undefined) {
-            this.add.text(400, 200, `CPU ${enemy_score} x ${player_score} JOG`, { fontFamily: MenuScene.gameFont, fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
+        let player_score = this.registry.get('score');
+
+        if (player_score !== undefined) {
+            this.add.text(400, 250, `Pontuação: ${player_score}`, { fontFamily: MenuScene.gameFont, fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
         }
 
         this.time.delayedCall(650, () => {

@@ -9,13 +9,14 @@ export default class MenuScene extends Phaser.Scene {
 
     create() {
         this.add.text(400, 100, 'Tetris', { fontFamily: MenuScene.gameFont, fontSize: '48px', fill: '#ffffff' }).setOrigin(0.5);
-    
-        let player_score = this.registry.get('playerScore')
-        let enemy_score = this.registry.get('enemyScore')
 
-        if (player_score !== undefined && enemy_score !== undefined) {
-            this.add.text(400, 200, `CPU ${enemy_score} x ${player_score} JOG`, { fontFamily: MenuScene.gameFont, fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
+        let score = this.registry.get('score');
+        if (score !== undefined) {
+            this.add.text(400, 200, `Pontuação: ${score}`, { fontFamily: MenuScene.gameFont, fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
         }
+
+        let record = localStorage.getItem('tetris_record') || 0;
+        this.add.text(400, 250, `Recorde: ${record}`, { fontFamily: MenuScene.gameFont, fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
 
         this.time.delayedCall(650, () => {
             this.addButton();

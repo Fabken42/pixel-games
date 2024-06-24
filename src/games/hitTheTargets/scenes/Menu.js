@@ -8,13 +8,16 @@ export default class MenuScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(400, 100, 'Breakout', { fontFamily: MenuScene.gameFont, fontSize: '48px', fill: '#ffffff' }).setOrigin(0.5);
-    
-        let player_score = this.registry.get('playerScore')
-        let enemy_score = this.registry.get('enemyScore')
+        this.add.text(400, 100, 'Hit The Targets', { fontFamily: MenuScene.gameFont, fontSize: '48px', fill: '#ffffff' }).setOrigin(0.5);
 
-        if (player_score !== undefined && enemy_score !== undefined) {
-            this.add.text(400, 200, `CPU ${enemy_score} x ${player_score} JOG`, { fontFamily: MenuScene.gameFont, fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
+        let score = this.registry.get('score');
+        let precision = this.registry.get('precision');
+
+        if (score !== undefined) {
+            this.add.text(400, 200, `Pontuação: ${score}`, { fontFamily: MenuScene.gameFont, fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
+        }
+        if (precision !== undefined) {
+            this.add.text(400, 250, `Precisão: ${precision}%`, { fontFamily: MenuScene.gameFont, fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5);
         }
 
         this.time.delayedCall(650, () => {

@@ -1,0 +1,15 @@
+.header {
+    background: linear-gradient(to bottom, #005557, #009da0);
+    text-align: center; /* Centraliza o texto horizontalmente */
+    padding: 20px;
+}
+
+.header-link {
+    color: #f0f0f0; /* Quase branco */
+    text-decoration: none;
+    font-size: 1.5em;
+}
+
+.header-link:hover {
+    color: #e0e0e0; /* Um pouco mais escuro no hover */
+}

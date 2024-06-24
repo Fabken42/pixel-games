@@ -6,12 +6,13 @@ import DragonBall from "../assets/img/dragonBall.png";
 
 import BackgroundMusic from "../assets/audio/background-music.wav";
 import EatingSound from "../assets/audio/eating-sound.mp3";
+import LooseGame from "../assets/audio/looseGame.mp3";
 
 export default class GameScene extends Phaser.Scene {
     static gameFont = '"Press Start 2P"';
     static increaseTimes = 5;
     static squareSize = 50;
-    static moveDelay = 120;
+    static moveDelay = 150;
 
     constructor() {
         super({ key: 'gameScene' });
@@ -24,7 +25,8 @@ export default class GameScene extends Phaser.Scene {
         this.load.image('dragonBall', DragonBall);
         this.load.audio("backgroundMusic", BackgroundMusic);
         this.load.audio("eatingSound", EatingSound);
-        
+        this.load.audio("looseGame", LooseGame);
+
     }
 
     create() {
@@ -45,12 +47,6 @@ export default class GameScene extends Phaser.Scene {
 
         this.backgroundMusic = this.sound.add('backgroundMusic', { loop: true, volume: 0.75 });
         this.backgroundMusic.play();
-
-        this.scoreText = this.add.text(-50, -50, this.score, {
-            fontFamily: GameScene.gameFont,
-            fontSize: '16px',
-            fill: '#000',
-        })
 
         this.time.addEvent({
             delay: GameScene.moveDelay,
@@ -100,22 +96,33 @@ export default class GameScene extends Phaser.Scene {
                 removedDragonPart.setRotation(direction.rotation);
                 this.dragonBodyParts.unshift(removedDragonPart);
             }
-
             this.dragonHead.x += direction.dx;
             this.dragonHead.y += direction.dy;
         }
 
+        if (this.nextMoveDirection) {
+            this.moveDirection = this.nextMoveDirection;
+            this.nextMoveDirection = '';
+        } else {
+            this.moveDragonKeyPressed = false;
+        }
+
         this.checkGameOver();
-        this.moveDragonKeyPressed = false;
         this.increaseDragonSize = false;
     }
 
     dragonEatBall() {
-        this.sound.play("eatingSound", { volume: 0.5 });
-        var scoreText = this.add.text(this.dragonBall.x, this.dragonBall.y, ++this.score, { fontSize: '42px', fill: '#e6cc00' }).setDepth(1).setOrigin(0.5);
-        this.time.delayedCall(750, () => {
-            scoreText.destroy();
-        }, [], this);
+        this.sound.play("eatingSound", { volume: 0.4 });
+        var scoreText = this.add.text(this.dragonBall.x, this.dragonBall.y, ++this.score, { fontFamily: GameScene.gameFont, fontSize: '24px', fill: '#e6cc00' }).setDepth(1).setOrigin(0.5);
+
+        this.tweens.add({
+            targets: scoreText,
+            alpha: 0,
+            duration: 1800,
+            onComplete: () => {
+                scoreText.destroy();
+            }
+        });
 
         this.moveDragonBall();
         this.increaseDragonSize = true;
@@ -160,26 +167,30 @@ export default class GameScene extends Phaser.Scene {
             }
         }
     }
-
     update() {
-        if (!this.moveDragonKeyPressed) {
-            if (this.keys.up.isDown && this.moveDirection !== 'down') {
+        const directionMap = {
+            up: { key: this.keys.up, opposite: 'down' },
+            down: { key: this.keys.down, opposite: 'up' },
+            left: { key: this.keys.left, opposite: 'right' },
+            right: { key: this.keys.right, opposite: 'left' }
+        };
+
+        for (const direction in directionMap) {
+            const key = directionMap[direction].key;
+
+            if (key.isDown && this.moveDirection !== directionMap[direction].opposite) {
                 this.moveDragonKeyPressed = true;
-                this.moveDirection = 'up';
-            } else if (this.keys.down.isDown && this.moveDirection !== 'up') {
-                this.moveDragonKeyPressed = true;
-                this.moveDirection = 'down';
-            } else if (this.keys.left.isDown && this.moveDirection !== 'right') {
-                this.moveDragonKeyPressed = true;
-                this.moveDirection = 'left';
-            } else if (this.keys.right.isDown && this.moveDirection !== 'left') {
-                this.moveDragonKeyPressed = true;
-                this.moveDirection = 'right';
+                if (!this.moveDragonKeyPressed) {
+                    this.moveDirection = direction;
+                } else if (this.moveDirection !== directionMap[direction].opposite) {
+                    this.nextMoveDirection = direction;
+                }
             }
         }
     }
 
     gameOver() {
+        this.sound.play('looseGame', { volume: 0.6 })
         this.backgroundMusic.stop();
         this.registry.set('score', this.score);
         this.scene.start('menuScene');

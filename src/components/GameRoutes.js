@@ -6,9 +6,9 @@ export default function GameRoutes() {
     return (
       <Routes>
         <Route path="/2d-runner" element={<GameSceneConfig folderName="2DRunner" canvasWidth={800} canvasHeight={600} gravity={0} isPixelArt={true} />} />
-        <Route path="/breakout" element={<GameSceneConfig folderName="breakout" canvasWidth={800} canvasHeight={600} gravity={0} isPixelArt={true} />} />
-        <Route path="/fruit-catch" element={<GameSceneConfig folderName="fruitCatch" canvasWidth={800} gravity={0} canvasHeight={600} isPixelArt={true} />} />
-        <Route path="/match-three" element={<GameSceneConfig folderName="matchThree" canvasWidth={800} gravity={0} canvasHeight={600} isPixelArt={true} />} />
+        <Route path="/climb-platforms" element={<GameSceneConfig folderName="climbPlatforms" canvasWidth={800} canvasHeight={600} gravity={300} isPixelArt={true} />} />
+        <Route path="/hit-the-targets" element={<GameSceneConfig folderName="hitTheTargets" canvasWidth={800} canvasHeight={600} gravity={0} isPixelArt={true} />} />
+        <Route path="/fruit-catch" element={<GameSceneConfig folderName="fruitCatch" canvasWidth={800} gravity={200} canvasHeight={600} isPixelArt={true} />} />
         <Route path="/maze-game" element={<GameSceneConfig folderName="mazeGame" canvasWidth={800} gravity={0} canvasHeight={600} isPixelArt={true} />} />
         <Route path="/memory-game" element={<GameSceneConfig folderName="memoryGame" canvasWidth={800} gravity={0} canvasHeight={600} isPixelArt={true} />} />
         <Route path="/pong" element={<GameSceneConfig folderName="pong" canvasWidth={800} canvasHeight={600} gravity={0} isPixelArt={true} />} />
