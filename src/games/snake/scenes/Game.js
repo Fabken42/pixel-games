@@ -4,7 +4,6 @@ import DragonHead from "../assets/img/dragonHead.png";
 import DragonBody from "../assets/img/dragonBody.png";
 import DragonBall from "../assets/img/dragonBall.png";
 
-import BackgroundMusic from "../assets/audio/background-music.wav";
 import EatingSound from "../assets/audio/eating-sound.mp3";
 import LooseGame from "../assets/audio/looseGame.mp3";
 
@@ -23,7 +22,6 @@ export default class GameScene extends Phaser.Scene {
         this.load.image('dragonHead', DragonHead);
         this.load.image('dragonBody', DragonBody);
         this.load.image('dragonBall', DragonBall);
-        this.load.audio("backgroundMusic", BackgroundMusic);
         this.load.audio("eatingSound", EatingSound);
         this.load.audio("looseGame", LooseGame);
 
@@ -44,9 +42,6 @@ export default class GameScene extends Phaser.Scene {
         this.add.image(0, 0, 'dragonBG').setOrigin(0).setScale(GameScene.increaseTimes);
         this.drawInitialDragon();
         this.dragonBall = this.add.sprite(10 * GameScene.squareSize - GameScene.squareSize / 2, 6 * GameScene.squareSize - GameScene.squareSize / 2, 'dragonBall').setScale(GameScene.increaseTimes).setOrigin(0.5);
-
-        this.backgroundMusic = this.sound.add('backgroundMusic', { loop: true, volume: 0.75 });
-        this.backgroundMusic.play();
 
         this.time.addEvent({
             delay: GameScene.moveDelay,
@@ -191,7 +186,6 @@ export default class GameScene extends Phaser.Scene {
 
     gameOver() {
         this.sound.play('looseGame', { volume: 0.6 })
-        this.backgroundMusic.stop();
         this.registry.set('score', this.score);
         this.scene.start('menuScene');
     }

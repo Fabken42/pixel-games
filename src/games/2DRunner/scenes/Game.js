@@ -4,7 +4,7 @@ import Player from "../assets/img/player.png";
 import EnemyAir from "../assets/img/enemyAir.png";
 import EnemyGround from "../assets/img/enemyGround.png";
 import GameBG from "../assets/img/gameBG.png";
-
+import BackgroundMusic from "../assets/audio/game-audio.mp3";
 import LooseSound from "../assets/audio/loose.mp3";
 import JumpSound from "../assets/audio/jump.mp3";
 
@@ -23,6 +23,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.audio('backgroundMusic', BackgroundMusic);
         this.load.image('gameBG', GameBG);
         this.load.image('player', Player);
         this.load.image('enemyAir', EnemyAir);
@@ -33,6 +34,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create() {
+        //música de fundo
+        this.backgroundMusic = this.sound.add('backgroundMusic', { volume: 0.5, loop: true });
+        this.backgroundMusic.play();
+
         this.backgrounds = [
             this.add.image(0, 0, 'gameBG').setOrigin(0, 0).setScale(5),
             this.add.image(this.scale.width, 0, 'gameBG').setOrigin(0, 0).setScale(5)
@@ -128,6 +133,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     gameOver() {
+        this.backgroundMusic.stop();
         this.sound.play('looseSound', { volume: 0.7 });
         this.registry.set('score', this.score);
         this.scene.start('menuScene');

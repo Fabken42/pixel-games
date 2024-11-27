@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
 import Enemy from '../assets/img/enemy.png';
-import Lava from '../assets/img/lava.png';
+import Lava01 from '../assets/img/lava01.png';
+import Lava02 from '../assets/img/lava02.png';
 import Platform from '../assets/img/platform.png';
 import Player from '../assets/img/player.png';
-
+import Nuvem from '../assets/img/nuvem.png';
 import Jump from '../assets/audio/jump.mp3';
 import Loose from '../assets/audio/loose.mp3';
 import Win from '../assets/audio/win.mp3';
@@ -38,8 +39,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image('cloud', Nuvem);
         this.load.image('enemy', Enemy);
-        this.load.image('lava', Lava);
+        this.load.image('lava01', Lava01);
+        this.load.image('lava02', Lava02);
         this.load.image('platform', Platform);
         this.load.image('player', Player);
         this.load.audio('jumpSound', Jump);
@@ -51,6 +54,22 @@ export default class GameScene extends Phaser.Scene {
         this.currentDifficulty = 'easy';
         this.raiseLavaTime = 0;
         this.cameras.main.setBackgroundColor('#87CEEB');
+
+        this.clouds = this.add.group();
+        const totalClouds = 32; // Aumentar o número total de nuvens
+
+        for (let i = 0; i < totalClouds; i++) {
+            const x = Phaser.Math.Between(0, 800); // Posição horizontal aleatória
+            const y = (-200 * i) + 500; // Posição vertical com distribuição controlada
+
+            const cloud = this.add.image(x, y, 'cloud')
+                .setScale(4)
+                .setAlpha(0.75);
+
+            cloud.direction = Math.random() > 0.5 ? 'right' : 'left'; // Define direção aleatória
+            cloud.cloudIndex = i;
+            this.clouds.add(cloud);
+        }
 
         this.platforms = this.physics.add.staticGroup();
         this.enemies = this.physics.add.group({
@@ -64,8 +83,20 @@ export default class GameScene extends Phaser.Scene {
         const initialPlatform = this.platforms.getChildren()[0];
         this.player = this.physics.add.sprite(GameScene.platformPositions[1], initialPlatform.y - 30, 'player').setScale(5).setCollideWorldBounds(true).setGravityY(350);
 
-        this.lava = this.physics.add.sprite(400, 900, 'lava').setScale(5);
+        this.lava = this.physics.add.sprite(400, 900, 'lava01').setScale(5);
         this.lava.body.setAllowGravity(false);
+
+        this.isLava01 = true; // Variável para controlar qual sprite está atualmente ativo
+
+        this.time.addEvent({
+            delay: 900, // Tempo entre as trocas em milissegundos (ajuste conforme necessário)
+            callback: () => {
+                this.lava.setTexture(this.isLava01 ? 'lava02' : 'lava01');
+                this.isLava01 = !this.isLava01; // Alterna entre true e false
+            },
+            loop: true // Repete indefinidamente
+        });
+
 
         this.setColliders();
         this.setControls();
@@ -235,6 +266,26 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
+        // Atualizar posição das nuvens
+        this.clouds.getChildren().forEach(cloud => {
+            const speed = 0.5; // Velocidade de movimento
+
+            // Movimenta nuvens conforme a direção
+            if (cloud.direction === 'right') {
+                cloud.x += speed;
+                if (cloud.x > 900) { // Saiu pela direita
+                    cloud.x = -100; // Reaparece na esquerda
+                    cloud.y = (-200 * cloud.cloudIndex) + 500; // Reajusta com base no índice
+                }
+            } else {
+                cloud.x -= speed;
+                if (cloud.x < -100) { // Saiu pela esquerda
+                    cloud.x = 900; // Reaparece na direita
+                    cloud.y = (-200 * cloud.cloudIndex) + 500; // Reajusta com base no índice
+                }
+            }
+        });
+
         if (this.player.y < -5635) {
             this.gameOver('winSound');
         } else if (this.player.y < -3580) {

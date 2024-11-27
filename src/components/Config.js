@@ -14,7 +14,7 @@ export default function GameSceneConfig({ folderName, canvasWidth, canvasHeight,
             default: 'arcade',
             arcade: {
                 gravity: { y: gravity },
-                debug:false
+                debug: false
             }
         },
         pixelArt: isPixelArt,
